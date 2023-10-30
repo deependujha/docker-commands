@@ -1,0 +1,49 @@
+# This is a dummy Docker Compose file with comments
+version: '3.8'  # Specify the Docker Compose version
+
+services:  # Define the services that will run in containers
+
+  # Service 1: Web Application
+  web_app:
+    image: nginx:latest  # Docker image to use for this service
+    ports:
+      - "8080:80"  # Map host port 8080 to container port 80
+    volumes:
+      - ./web_app:/usr/share/nginx/html  # Mount a host directory to a container directory
+      - web_app_data:/app  # Named volume
+      - /app/node_modules  # anonymous volume
+    environment:
+      - NODE_ENV=development  # Set environment variables
+      - PORT=8080
+    container_name: web_app_container  # Specify the container name
+    args:
+      - arg1=value1  # Specify command-line arguments here
+      - arg2=value2
+
+  # Service 2: Database
+  db:
+    image: mysql:5.7  # Docker image for the database
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password  # Set environment variables
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: my_user
+      MYSQL_PASSWORD: my_password
+    volumes:
+      - ./db_data:/var/lib/mysql  # Mount a host directory to the database data directory
+    container_name: db_container  # Specify the container name
+
+  # Service 3: Redis Cache
+  frontend:
+    build:  # Build the image from the Dockerfile in the frontend directory
+        context: ./frontend  # Specify the build context
+        dockerfile: Dockerfile.dev  # Specify the Dockerfile name. Default is Dockerfile
+
+    ports:
+      - "6379:6379"
+
+
+# Define volumes for persistent data
+volumes:
+  web_app_data: 
+  db_data:
+  # the above is the syntax for creating named volumes. We need to specify them explicitly. After `:`, we don't need to specify the path. Docker will automatically create a volume with the name we specified.
